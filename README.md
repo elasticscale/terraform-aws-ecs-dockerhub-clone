@@ -14,6 +14,10 @@ An example of the containers variable:
       "hashicorp/vault" = ["1.14", "1.13.3"],
     }
 
+The paths of the images will be prefixed with the namespace variable to prevent conflicts. If your image URLs will be:
+
+    XXXXX.dkr.ecr.eu-west-1.amazonaws.com/ecsclone/redis
+
 For more debugging steps check out [the elasticscale blog](https://elasticscale.cloud/en/use-pull-through-caches-on-ecr-to-circumvent-docker-hub-rate-limits/).
 
 ## Requirements
