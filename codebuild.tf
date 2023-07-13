@@ -1,3 +1,7 @@
+locals {
+  repolist = join(",", [for k, repo in var.containers : join(",", [for tag in repo : "${k}:${tag}"])])
+}
+
 module "build" {
   source             = "cloudposse/codebuild/aws"
   version            = "1.0.0"
@@ -15,19 +19,24 @@ module "build" {
   buildspec          = file("buildspec.yml")
   environment_variables = [
     {
-      name  = "JENKINS_URL"
-      value = "https://jenkins.example.com"
+      name  = "REPOLIST"
+      value = local.repolist
       type  = "PLAINTEXT"
     },
     {
-      name  = "COMPANY_NAME"
-      value = "Amazon"
+      name  = "NAMESPACE"
+      value = var.namespace
       type  = "PLAINTEXT"
     },
     {
-      name  = "TIME_ZONE"
-      value = "Pacific/Auckland"
+      name  = "DOCKERHUB_USERNAME",
+      value = var.docker_hub_username,
       type  = "PLAINTEXT"
+    },
+    {
+      name  = "DOCKERHUB_TOKEN",
+      value = aws_ssm_parameter.accesstoken.name,
+      type  = "PARAMETER_STORE"
     }
   ]
 }
