@@ -1,13 +1,12 @@
 locals {
   repolist = join(",", [for k, repo in var.containers : join(",", [for tag in repo : "${k}:${tag}"])])
 }
-
 module "build" {
   source             = "cloudposse/codebuild/aws"
   version            = "1.0.0"
-  namespace          = "eg"
-  stage              = "staging"
-  name               = "app"
+  namespace          = var.prefix
+  stage              = ""
+  name               = "ecr"
   build_image        = "aws/codebuild/standard:7.0"
   build_compute_type = "BUILD_GENERAL1_SMALL"
   build_timeout      = 60

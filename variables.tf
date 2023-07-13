@@ -24,3 +24,8 @@ variable "prefix" {
   description = "Prefix to add to all resources"
   default     = "ecs-clone-"
 }
+variable "schedule_expression" {
+  type        = string
+  default     = "cron(0 9 ? * * *)"
+  description = "EventBridge schedule expression ie how often to download the new images"
+}
