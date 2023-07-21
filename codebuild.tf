@@ -1,9 +1,10 @@
 locals {
   repolist = join(",", [for k, repo in var.containers : join(",", [for tag in repo : "${k}:${tag}"])])
   buildstrings = {
-    "hashicorp/vault:1.14" = join("\n", ["a", "b", "c"])
+    for k, repo in flatten([for k, repo in var.containers : [for tag in repo : "${k}:${tag}"]]) : "${repo}" => lookup(var.build_commands, repo, [])
   }
 }
+
 module "build" {
   source             = "cloudposse/codebuild/aws"
   version            = "1.0.0"

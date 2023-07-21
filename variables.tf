@@ -6,6 +6,11 @@ variable "containers" {
   type        = map(list(string))
   description = "Containers to clone including tags"
 }
+variable "build_commands" {
+  type        = map(list(string))
+  description = "This allows you to add additional lines to the Dockerfile before pushing to ECR"
+  default     = {}
+}
 variable "docker_hub_username" {
   type        = string
   description = "Docker Hub username"
