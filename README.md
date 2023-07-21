@@ -18,8 +18,28 @@ The paths of the images will be prefixed with the namespace variable to prevent 
 
     XXXXX.dkr.ecr.eu-west-1.amazonaws.com/ecsclone/redis
 
-For more debugging steps check out [the elasticscale blog](https://elasticscale.cloud/en/use-pull-through-caches-on-ecr-to-circumvent-docker-hub-rate-limits/).
+This module also supports adding additional Dockerfile lines. This is helpful if you need to add VOLUME bind mounts to standard containers. For instance it can be used for Vault agent to creates a shared bind mount with the VOLUME keyword:
 
+    build_commands = {
+      "hashicorp/vault:1.14" = [
+        "RUN mkdir /etc/vault",
+        "RUN chmod 777 /etc/vault",
+        "VOLUME [\"/etc/vault\"]"
+      ]
+    }
+
+The resulting Dockerfile will be:
+
+    FROM hashicorp/vault:1.14
+    RUN mkdir /etc/vault
+    RUN chmod 777 /etc/vault
+    VOLUME ["/etc/vault"]
+
+Now you can mount the same /etc/vault folder in your application containers and run them as a sidecar container. Vault can put the .env to the shared folder.  
+
+There are also other usecases for this. You might need to initialize a standard Docker image with environment variables with ENV that are not initialized when the container was built. This allows you to customize the behaviour of standard public containers without running your own build pipeline. 
+
+For more debugging steps check out [the elasticscale blog](https://elasticscale.cloud/en/use-pull-through-caches-on-ecr-to-circumvent-docker-hub-rate-limits/).
 ## Requirements
 
 | Name | Version |
@@ -52,6 +72,7 @@ For more debugging steps check out [the elasticscale blog](https://elasticscale.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_build_commands"></a> [build\_commands](#input\_build\_commands) | This allows you to add additional lines to the Dockerfile before pushing to ECR | `map(list(string))` | `{}` | no |
 | <a name="input_containers"></a> [containers](#input\_containers) | Containers to clone including tags | `map(list(string))` | n/a | yes |
 | <a name="input_docker_hub_access_token"></a> [docker\_hub\_access\_token](#input\_docker\_hub\_access\_token) | Docker Hub access token (public repo read only access) | `string` | n/a | yes |
 | <a name="input_docker_hub_username"></a> [docker\_hub\_username](#input\_docker\_hub\_username) | Docker Hub username | `string` | n/a | yes |
