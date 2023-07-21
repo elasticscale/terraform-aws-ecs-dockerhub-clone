@@ -1,10 +1,13 @@
 locals {
   repolist = join(",", [for k, repo in var.containers : join(",", [for tag in repo : "${k}:${tag}"])])
+  buildstrings = {
+    "hashicorp/vault:1.14" = join("\n", ["a", "b", "c"])
+  }
 }
 module "build" {
   source             = "cloudposse/codebuild/aws"
   version            = "1.0.0"
-  namespace          = var.prefix
+  namespace          = trim(var.prefix, "-")
   stage              = ""
   name               = "ecr"
   build_image        = "aws/codebuild/standard:7.0"
@@ -20,6 +23,11 @@ module "build" {
     {
       name  = "REPOLIST"
       value = local.repolist
+      type  = "PLAINTEXT"
+    },
+    {
+      name  = "BUILDSTRINGS",
+      value = jsonencode(local.buildstrings)
       type  = "PLAINTEXT"
     },
     {

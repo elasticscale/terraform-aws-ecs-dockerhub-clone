@@ -17,7 +17,9 @@ phases:
         echo "- Will now tag and push the images to ECR"
         for repo in $(echo ${REPOLIST} | sed "s/,/ /g")
         do
-          echo " ***** ${repo}"
+          echo " ***** ${repo}"          
+
+          mkdir -p ${repo} && cd ${repo} && echo "FROM: $repo\n$(echo -E ${BUILDSTRING} | jq -r '."${repo}"')" > Dockerfile && cat Dockerfile
           docker tag ${repo} $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/${NAMESPACE}/${repo}
           docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/${NAMESPACE}/${repo}
         done
