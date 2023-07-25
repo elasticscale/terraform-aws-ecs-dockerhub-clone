@@ -5,7 +5,11 @@ provider "aws" {
 module "ecs_clone" {
   source = "../../"
   containers = {
-    "hashicorp/vault" = ["1.14", "1.13"]
+    "hashicorp/vault" = ["1.14", "1.13"],
+    "mongo" = ["latest"],
+    "redis" = ["latest"]
+    "alpine" = ["latest"]
+    "python" = ["latest"]
   }
   build_commands = {
     "hashicorp/vault:1.14" = [

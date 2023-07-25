@@ -5,13 +5,17 @@ phases:
     commands:      
       - |
         echo "- Cloning the following Docker Hub repositories for account ${AWS_ACCOUNT_ID} in region ${AWS_REGION}: ${REPOLIST}"
-
+        for repo in $(echo ${REPOLIST} | sed "s/,/ /g")
+        do
+          echo ">>> Pulling (30 attempts) ${repo}"
+          for i in seq 30; do docker pull docker.io/${repo} && break || sleep 60; done
+        done
         echo "- Will now login to ECR"
         aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
         echo "- Will now build and push the images to ECR"
         for repo in $(echo ${REPOLIST} | sed "s/,/ /g")
         do
-          echo " ***** ${repo}"          
+          echo ">>> Building and pushing ${repo}"          
           mkdir -p ${repo} && cd ${repo} && echo "FROM $repo\n$(echo ${BUILDSTRINGS} | jq -r --arg X $repo '.[$X] | join("\n")')" > Dockerfile && cat Dockerfile && docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/${NAMESPACE}/${repo} .          
           docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/${NAMESPACE}/${repo}
         done
