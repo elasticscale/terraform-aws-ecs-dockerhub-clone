@@ -5,36 +5,117 @@ locals {
   }
 }
 
-module "build" {
-  source             = "cloudposse/codebuild/aws"
-  version            = "1.0.0"
-  namespace          = trim(var.prefix, "-")
-  stage              = ""
-  name               = "ecr"
-  build_image        = "aws/codebuild/standard:7.0"
-  build_compute_type = "BUILD_GENERAL1_SMALL"
-  build_timeout      = 60
-  build_type         = "LINUX_CONTAINER"
-  source_type        = "NO_SOURCE"
-  artifact_type      = "NO_ARTIFACTS"
-  artifact_location  = null
-  privileged_mode    = true
-  buildspec          = file("${path.module}/buildspec.yml")
-  environment_variables = [
-    {
+data "aws_iam_policy_document" "assume_role" {
+  statement {
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["codebuild.amazonaws.com"]
+    }
+    actions = ["sts:AssumeRole"]
+  }
+}
+
+resource "aws_iam_role" "main" {
+  name               = "${var.prefix}codebuild-role"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+}
+
+data "aws_iam_policy_document" "main" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+    ]
+    resources = ["*"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "ecr:GetAuthorizationToken"
+    ]
+    resources = ["*"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "ecr:CompleteLayerUpload",
+      "ecr:UploadLayerPart",
+      "ecr:InitiateLayerUpload",
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:PutImage"
+    ]
+    resources = [
+      "arn:aws:ecr:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:repository/${var.namespace}/*",
+    ]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "ssm:GetParameters"
+    ]
+    resources = [aws_ssm_parameter.accesstoken.arn]
+  }
+}
+
+resource "aws_iam_role_policy" "main" {
+  role   = aws_iam_role.main.name
+  policy = data.aws_iam_policy_document.main.json
+}
+
+resource "aws_codebuild_project" "main" {
+  name          = "${var.prefix}codebuild"
+  build_timeout = "480"
+  service_role  = aws_iam_role.main.arn
+  artifacts {
+    type = "NO_ARTIFACTS"
+  }
+  environment {
+    compute_type                = "BUILD_GENERAL1_SMALL"
+    image                       = "aws/codebuild/standard:7.0"
+    type                        = "LINUX_CONTAINER"
+    image_pull_credentials_type = "CODEBUILD"
+    privileged_mode             = true
+    environment_variable {
       name  = "REPOLIST"
       value = local.repolist
-      type  = "PLAINTEXT"
-    },
-    {
-      name  = "BUILDSTRINGS",
+    }
+    environment_variable {
+      name  = "BUILDSTRINGS"
       value = jsonencode(local.buildstrings)
-      type  = "PLAINTEXT"
-    },
-    {
+    }
+    environment_variable {
       name  = "NAMESPACE"
       value = var.namespace
-      type  = "PLAINTEXT"
     }
-  ]
+    environment_variable {
+      name  = "AWS_REGION"
+      value = data.aws_region.current.name
+    }
+    environment_variable {
+      name  = "AWS_ACCOUNT_ID"
+      value = data.aws_caller_identity.current.account_id
+    }
+    environment_variable {
+      name  = "DOCKERHUB_USERNAME"
+      value = var.docker_hub_username
+    }
+    environment_variable {
+      name  = "DOCKERHUB_TOKEN"
+      value = aws_ssm_parameter.accesstoken.name
+      type  = "PARAMETER_STORE"
+    }
+  }
+  source {
+    type      = "NO_SOURCE"
+    buildspec = file("${path.module}/buildspec.yml")
+  }
+  logs_config {
+    cloudwatch_logs {
+      group_name  = "${var.prefix}log-group"
+      stream_name = "${var.prefix}log-stream"
+    }
+  }
 }

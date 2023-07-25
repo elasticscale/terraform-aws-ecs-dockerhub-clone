@@ -17,3 +17,11 @@ variable "prefix" {
   description = "Prefix to add to all resources"
   default     = "ecs-clone-"
 }
+variable "docker_hub_username" {
+  type        = string
+  description = "Docker Hub username"
+}
+variable "docker_hub_access_token" {
+  type        = string
+  description = "Docker Hub access token (public repo read only access)"
+}

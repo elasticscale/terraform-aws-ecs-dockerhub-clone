@@ -3,13 +3,15 @@ provider "aws" {
 }
 
 module "ecs_clone" {
-  source = "../../"
+  source                  = "../../"
+  docker_hub_username     = "your_dockerhub_username"
+  docker_hub_access_token = "dckr_pat_aaaaaaaaaaaaaaaaaaaaaaaaaaa"
   containers = {
     "hashicorp/vault" = ["1.14", "1.13"],
-    "mongo" = ["latest"],
-    "redis" = ["latest"]
-    "alpine" = ["latest"]
-    "python" = ["latest"]
+    "mongo"           = ["latest"],
+    "redis"           = ["latest"]
+    "alpine"          = ["latest"]
+    "python"          = ["latest"]
   }
   build_commands = {
     "hashicorp/vault:1.14" = [

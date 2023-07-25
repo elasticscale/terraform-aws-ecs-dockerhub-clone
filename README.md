@@ -1,10 +1,8 @@
-<!-- BEGIN_TF_DOCS -->
-
 ## Description
 
 This module is able to use your Docker Hub details and periodically clone Docker Hub repo's to private ECR repositories. This way you won't run into Docker Hub rate limits. If you pair it with a VPC endpoint you can get improved pull results (and perhaps use this in a stricter environment with no internet access).
 
-Your Docker Hub access token needs to have public repo pull permissions.
+Your Docker Hub access token needs to have public repo pull permissions (that is the only permission it needs as well). Otherwise the CodeBuild will run into rate limiting issues because the networking is shared.
 
 An example of the containers variable:
 
@@ -39,34 +37,42 @@ Now you can mount the same /etc/vault folder in your application containers and 
 
 There are also other usecases for this. You might need to initialize a standard Docker image with environment variables with ENV that are not initialized when the container was built. This allows you to customize the behaviour of standard public containers without running your own build pipeline. 
 
+A fully working setup can be found in the examples folder.
+
 For more debugging steps check out [the elasticscale blog](https://elasticscale.cloud/en/use-pull-through-caches-on-ecr-to-circumvent-docker-hub-rate-limits/).
+
 ## Requirements
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 4.67.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 4.22.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
 | <a name="provider_aws"></a> [aws](#provider\_aws) | 4.67.0 |
+| <a name="provider_null"></a> [null](#provider\_null) | 3.2.1 |
 
 ## Modules
 
-| Name | Source | Version |
-|------|--------|---------|
-| <a name="module_build"></a> [build](#module\_build) | cloudposse/codebuild/aws | 1.0.0 |
+No modules.
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [aws_cloudwatch_event_rule.cron](https://registry.terraform.io/providers/hashicorp/aws/4.67.0/docs/resources/cloudwatch_event_rule) | resource |
-| [aws_cloudwatch_event_target.codebuild](https://registry.terraform.io/providers/hashicorp/aws/4.67.0/docs/resources/cloudwatch_event_target) | resource |
-| [aws_ecr_repository.ecr](https://registry.terraform.io/providers/hashicorp/aws/4.67.0/docs/resources/ecr_repository) | resource |
-| [aws_iam_role.cloudwatch_event](https://registry.terraform.io/providers/hashicorp/aws/4.67.0/docs/resources/iam_role) | resource |
-| [aws_ssm_parameter.accesstoken](https://registry.terraform.io/providers/hashicorp/aws/4.67.0/docs/resources/ssm_parameter) | resource |
+| [aws_codebuild_project.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/codebuild_project) | resource |
+| [aws_ecr_lifecycle_policy.foopolicy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecr_lifecycle_policy) | resource |
+| [aws_ecr_repository.ecr](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecr_repository) | resource |
+| [aws_iam_role.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role_policy.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
+| [aws_ssm_parameter.accesstoken](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter) | resource |
+| [null_resource.init](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
+| [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
+| [aws_iam_policy_document.assume_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
 
 ## Inputs
 
@@ -78,8 +84,6 @@ For more debugging steps check out [the elasticscale blog](https://elasticscale.
 | <a name="input_docker_hub_username"></a> [docker\_hub\_username](#input\_docker\_hub\_username) | Docker Hub username | `string` | n/a | yes |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Prefix to add before all pulled containers to prevent conflicts | `string` | `"ecsclone"` | no |
 | <a name="input_prefix"></a> [prefix](#input\_prefix) | Prefix to add to all resources | `string` | `"ecs-clone-"` | no |
-| <a name="input_region"></a> [region](#input\_region) | AWS region to launch the resources in | `string` | n/a | yes |
-| <a name="input_schedule_expression"></a> [schedule\_expression](#input\_schedule\_expression) | EventBridge schedule expression ie how often to download the new images | `string` | `"cron(0 9 ? * * *)"` | no |
 
 ## Outputs
 
