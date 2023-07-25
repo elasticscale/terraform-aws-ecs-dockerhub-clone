@@ -5,8 +5,7 @@ phases:
     commands:      
       - |
         echo "- Cloning the following Docker Hub repositories for account ${AWS_ACCOUNT_ID} in region ${AWS_REGION}: ${REPOLIST}"
-        echo "- Logging in to Docker Hub"
-        echo $DOCKERHUB_TOKEN | docker login --username ${DOCKERHUB_USERNAME} --password-stdin
+
         echo "- Will now login to ECR"
         aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
         echo "- Will now build and push the images to ECR"

@@ -19,7 +19,7 @@ module "build" {
   artifact_type      = "NO_ARTIFACTS"
   artifact_location  = null
   privileged_mode    = true
-  buildspec          = file("buildspec.yml")
+  buildspec          = file("${path.module}/buildspec.yml")
   environment_variables = [
     {
       name  = "REPOLIST"
@@ -35,16 +35,6 @@ module "build" {
       name  = "NAMESPACE"
       value = var.namespace
       type  = "PLAINTEXT"
-    },
-    {
-      name  = "DOCKERHUB_USERNAME",
-      value = var.docker_hub_username,
-      type  = "PLAINTEXT"
-    },
-    {
-      name  = "DOCKERHUB_TOKEN",
-      value = aws_ssm_parameter.accesstoken.name,
-      type  = "PARAMETER_STORE"
     }
   ]
 }
