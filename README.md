@@ -45,7 +45,7 @@ For more debugging steps check out [the elasticscale blog](https://elasticscale.
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 4.22.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.22.0 |
 
 ## Providers
 
@@ -87,4 +87,6 @@ No modules.
 
 ## Outputs
 
-No outputs.
+| Name | Description |
+|------|-------------|
+| <a name="output_image_base_url"></a> [image\_base\_url](#output\_image\_base\_url) | The base URL for your ECR images from Docker Hub |
