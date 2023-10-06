@@ -39,7 +39,7 @@ There are also other usecases for this. You might need to initialize a standard 
 
 A fully working setup can be found in the examples folder.
 
-For more debugging steps check out [the elasticscale blog](https://elasticscale.cloud/en/use-pull-through-caches-on-ecr-to-circumvent-docker-hub-rate-limits/).
+For more debugging steps check out [the elasticscale blog](https://elasticscale.cloud/use-pull-through-caches-on-ecr-to-circumvent-docker-hub-rate-limits/).
 
 ## About ElasticScale
 
@@ -79,7 +79,7 @@ No modules.
 | Name | Type |
 |------|------|
 | [aws_codebuild_project.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/codebuild_project) | resource |
-| [aws_ecr_lifecycle_policy.foopolicy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecr_lifecycle_policy) | resource |
+| [aws_ecr_lifecycle_policy.foopolicy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecr_lifecycle_policy) | resource | A copy and paste error from my end but this deletes the images automatically if they get stale
 | [aws_ecr_repository.ecr](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecr_repository) | resource |
 | [aws_iam_role.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role_policy.main](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
@@ -94,12 +94,14 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_account_id"></a> [account\_id](#input\_account\_id) | AWS account ID | `string` | `null` | no |
 | <a name="input_build_commands"></a> [build\_commands](#input\_build\_commands) | This allows you to add additional lines to the Dockerfile before pushing to ECR | `map(list(string))` | `{}` | no |
 | <a name="input_containers"></a> [containers](#input\_containers) | Containers to clone including tags | `map(list(string))` | n/a | yes |
 | <a name="input_docker_hub_access_token"></a> [docker\_hub\_access\_token](#input\_docker\_hub\_access\_token) | Docker Hub access token (public repo read only access) | `string` | n/a | yes |
 | <a name="input_docker_hub_username"></a> [docker\_hub\_username](#input\_docker\_hub\_username) | Docker Hub username | `string` | n/a | yes |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | Prefix to add before all pulled containers to prevent conflicts | `string` | `"ecsclone"` | no |
 | <a name="input_prefix"></a> [prefix](#input\_prefix) | Prefix to add to all resources | `string` | `"ecs-clone-"` | no |
+| <a name="input_region"></a> [region](#input\_region) | AWS region | `string` | `null` | no |
 
 ## Outputs
 

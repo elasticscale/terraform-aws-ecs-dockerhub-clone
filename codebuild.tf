@@ -48,7 +48,7 @@ data "aws_iam_policy_document" "main" {
       "ecr:PutImage"
     ]
     resources = [
-      "arn:aws:ecr:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:repository/${var.namespace}/*",
+      "arn:aws:ecr:${local.region}:${local.account_id}:repository/${var.namespace}/*",
     ]
   }
   statement {
@@ -92,11 +92,11 @@ resource "aws_codebuild_project" "main" {
     }
     environment_variable {
       name  = "AWS_REGION"
-      value = data.aws_region.current.name
+      value = local.region
     }
     environment_variable {
       name  = "AWS_ACCOUNT_ID"
-      value = data.aws_caller_identity.current.account_id
+      value = local.account_id
     }
     environment_variable {
       name  = "DOCKERHUB_USERNAME"

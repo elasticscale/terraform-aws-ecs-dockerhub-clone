@@ -3,7 +3,8 @@ provider "aws" {
 }
 
 module "ecs_clone" {
-  source                  = "../../"
+  source = "../../"
+
   docker_hub_username     = "your_dockerhub_username"
   docker_hub_access_token = "dckr_pat_aaaaaaaaaaaaaaaaaaaaaaaaaaa"
   containers = {
@@ -13,6 +14,9 @@ module "ecs_clone" {
     "alpine"          = ["latest"]
     "python"          = ["latest"]
   }
+  // optionals
+  account_id = "875424272104"
+  region     = "eu-west-1"
   build_commands = {
     "hashicorp/vault:1.14" = [
       "RUN mkdir /etc/vault",

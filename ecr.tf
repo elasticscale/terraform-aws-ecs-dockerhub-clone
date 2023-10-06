@@ -5,6 +5,7 @@ resource "aws_ecr_repository" "ecr" {
   force_delete         = true
 }
 
+// i know this is a weird name, but i can't change it anymore without a new version, it hangs when re-applying
 resource "aws_ecr_lifecycle_policy" "foopolicy" {
   for_each   = aws_ecr_repository.ecr
   repository = each.value.name

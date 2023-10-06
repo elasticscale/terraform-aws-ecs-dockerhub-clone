@@ -25,3 +25,15 @@ variable "docker_hub_access_token" {
   type        = string
   description = "Docker Hub access token (public repo read only access)"
 }
+
+variable "region" {
+  type        = string
+  description = "AWS region (default to caller region)"
+  default     = null
+}
+
+variable "account_id" {
+  type        = string
+  description = "AWS account ID (default to caller ID)"
+  default     = null
+}

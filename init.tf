@@ -6,6 +6,6 @@ resource "null_resource" "init" {
     build_commands = jsonencode(local.buildstrings)
   }
   provisioner "local-exec" {
-    command = "aws codebuild start-build --project-name ${aws_codebuild_project.main.name} --region ${data.aws_region.current.name} > /dev/null"
+    command = "aws codebuild start-build --project-name ${aws_codebuild_project.main.name} --region ${local.region} > /dev/null"
   }
 }
