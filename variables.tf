@@ -37,3 +37,9 @@ variable "account_id" {
   description = "AWS account ID (default to caller ID)"
   default     = null
 }
+
+variable "profile" {
+  type        = string
+  description = "AWS profile to use"
+  default     = null
+}

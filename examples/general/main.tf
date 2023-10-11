@@ -15,6 +15,7 @@ module "ecs_clone" {
     "python"          = ["latest"]
   }
   // optionals
+  profile    = "default"
   account_id = "875424272104"
   region     = "eu-west-1"
   build_commands = {
